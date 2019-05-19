@@ -1,0 +1,35 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Preset"
+  },
+  "uiComponent": "picker",
+  "getable": true,
+  "setable": true,
+  "values": [
+    {
+      "id": "Movie",
+      "title": {
+        "en": "Movie"
+      }
+    },
+    {
+      "id": "Music",
+      "title": {
+        "en": "Music"
+      }
+    },
+    {
+      "id": "Custom",
+      "title": {
+        "en": "Custom"
+      }
+    },
+    {
+      "id": "Default",
+      "title": {
+        "en": "Default"
+      }
+    }
+  ]
+}

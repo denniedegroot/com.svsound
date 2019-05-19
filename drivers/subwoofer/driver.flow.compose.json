@@ -1,0 +1,27 @@
+{
+	"actions": [
+		{
+			"id": "set_volume",
+			"title": {
+				"en": "Set a volume",
+				"nl": "Stel een volume in",
+				"de": "Lautstärke einstellen"
+			},
+			"args": [
+				{
+					"type": "range",
+					"name": "db",
+					"min": -60,
+					"max": 0,
+					"step": 1,
+					"label": "dB",
+					"placeholder": {
+						"en": "Set a volume",
+						"nl": "Stel een volume in",
+						"de": "Lautstärke einstellen"
+					}
+				}
+			]
+		}
+	]
+}

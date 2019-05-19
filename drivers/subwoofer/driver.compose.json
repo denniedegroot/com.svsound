@@ -1,0 +1,26 @@
+{
+  "name": {
+    "en": "SVS Subwoofer"
+  },
+  "class": "speaker",
+  "capabilities": [
+    "volume_db"
+  ],
+  "images": {
+    "large": "/drivers/subwoofer/assets/images/large.png",
+    "small": "/drivers/subwoofer/assets/images/small.png"
+  },
+  "pair": [
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "navigation": {
+        "next": "add_devices"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ]
+}

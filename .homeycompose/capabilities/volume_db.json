@@ -1,0 +1,15 @@
+{
+  "type": "number",
+  "title": {
+    "en": "dB"
+  },
+  "uiComponent": "slider",
+  "getable": true,
+  "setable": true,
+  "units": {
+    "en": "dB"
+  },
+  "min": -60,
+  "max": 0,
+  "step": 1
+}
