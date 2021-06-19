@@ -26,8 +26,7 @@ class SubwooferDriver extends Homey.Driver {
 		// 		});
 		// 	});
 
-		new Homey.FlowCardAction('set_volume')
-			.register()
+		this.homey.flow.getActionCard('set_volume')
 			.registerRunListener(({ device, db }) => {
 				return device.setVolume(db);
 			})
@@ -35,7 +34,7 @@ class SubwooferDriver extends Homey.Driver {
 	}
 
 	discover() {
-		Homey.ManagerBLE.discover([ SERVICE_UUID ], 1000)
+		this.homey.ble.discover([ SERVICE_UUID ], 1000)
 			.then(devices => {
 				devices.forEach(device => {
 					if( this._devices[device.id] ) return;
@@ -47,8 +46,8 @@ class SubwooferDriver extends Homey.Driver {
 			.catch(this.error);
 	}
 
-	onPairListDevices( data, callback ) {
-		callback(null, Object.keys(this._devices).map(deviceId => {
+	async onPairListDevices( data ) {
+		return await Promise.all(Object.keys(this._devices).map(deviceId => {
 			return {
 				name: this._devices[deviceId].localName,
 				data: {
