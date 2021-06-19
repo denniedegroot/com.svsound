@@ -22,24 +22,21 @@ class SubwooferDevice extends Homey.Device {
 		], this._onCapabilitySubwoofer.bind(this), 300);
 		
 		const {id} = this.getData();
-		const driver = this.getDriver();
 
 		this._connectionTimer = null;
 		this._commandBusy = false;
 		this._commandQueue = [];
 		this._commandRetry = 0;
 
-		driver.ready(() => {
-			try {
-				this._device = driver.getSubwoofer(id);
+		try {
+			this._device = this.driver.getSubwoofer(id);
+			this._onDeviceInit();
+		} catch(err) {
+			this.driver.once(`device:${id}`, device => {
+				this._device = device;
 				this._onDeviceInit();
-			} catch(err) {
-				driver.once(`device:${id}`, device => {
-					this._device = device;
-					this._onDeviceInit();
-				});
-			}
-		});
+			});
+		}
 	}
 
 	async _onDeviceInit() {
@@ -137,7 +134,7 @@ class SubwooferDevice extends Homey.Device {
 		delete this._peripheral;
 
 		// Check if Queue is empty
-		setTimeout(() => { this._processQueue(true); }, 500);
+		setTimeout(() => { this._processQueue(true).catch(() => null); }, 500);
 
 		return Promise.resolve(true);
 	}
@@ -165,15 +162,15 @@ class SubwooferDevice extends Homey.Device {
 				return Promise.resolve(true);
 			}
 
-			const service = await this._getService();
+			this._commandBusy = true;
+
+			const service = await this._getService().catch((error) => this.log(error));
 
 			if (!service) {
 				this.log('_processQueue service missing');
 				setTimeout(() => { this._processQueue(true); }, 500);
 				return Promise.reject(new Error('missing_service'));
 			}
-
-			this._commandBusy = true;
 
 			while (this._commandQueue.length > 0) {
 				this._connectionTimerStart(BLE_DISCONNECT_TIMEOUT);
@@ -185,11 +182,6 @@ class SubwooferDevice extends Homey.Device {
 					.catch((error) => {
 						this.log(error.message);
 					});
-
-				/* Wait between commands, if send to fast this gives weird behaviour.
-				 * Ideally we should wait for a response, but the Homey API is limited.
-				 */
-				await this._delay(250);
 			}
 
 			this._commandRetry = 0;
@@ -197,6 +189,7 @@ class SubwooferDevice extends Homey.Device {
 
 			return Promise.resolve(true);
 		} catch (error) {
+			this._commandBusy = false;
 			this.log(error.message);
 			this._disconnect();
 
