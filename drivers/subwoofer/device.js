@@ -3,7 +3,8 @@
 const Homey = require('homey');
 
 const COMMAND_QUEUE_RETRY = 10;
-const BLE_DISCONNECT_TIMEOUT = 10;
+const BLE_DISCONNECT_TIMEOUT = 12;
+const BLE_SEARCH_TIMEOUT = 30;
 
 const {
 	SERVICE_UUID,
@@ -12,7 +13,7 @@ const {
 
 class SubwooferDevice extends Homey.Device {
 
-	onInit() {
+	async onInit() {
 		this.log('SVSound has been inited');
 		this.setUnavailable();
 
@@ -20,27 +21,31 @@ class SubwooferDevice extends Homey.Device {
 			'preset',
 			'volume_db'
 		], this._onCapabilitySubwoofer.bind(this), 300);
-		
-		const {id} = this.getData();
 
+		this._device = null;
 		this._connectionTimer = null;
 		this._commandBusy = false;
 		this._commandQueue = [];
 		this._commandRetry = 0;
 
-		try {
-			this._device = this.driver.getSubwoofer(id);
-			this._onDeviceInit();
-		} catch(err) {
-			this.driver.once(`device:${id}`, device => {
-				this._device = device;
-				this._onDeviceInit();
-			});
-		}
+		this._searchDevice(0);
 	}
 
 	async _onDeviceInit() {
 		this.setAvailable();
+	}
+
+	async _searchDevice(timeout) {
+		setTimeout(async () => {
+			const {id} = this.getData();
+			this._device = await this.homey.ble.find(id);
+
+			if (this._device != null && this._device.id == id) {
+				this._onDeviceInit();
+			} else {
+				this._searchDevice(BLE_SEARCH_TIMEOUT);
+			}
+		}, timeout * 1000);
 	}
 
 	_connectionTimerStart(timeout) {
@@ -106,6 +111,10 @@ class SubwooferDevice extends Homey.Device {
 		this.log('_getService connecting');
 		this._connectionTimerStart(BLE_DISCONNECT_TIMEOUT);
 		this._peripheral = await this._device.connect();
+
+		this._peripheral.once('disconnect', async () => {
+			this._disconnect();
+		});
 
 		await this._peripheral.discoverAllServicesAndCharacteristics();
 		const BLEservice = await this._peripheral.getService(SERVICE_UUID);
