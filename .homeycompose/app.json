@@ -1,6 +1,6 @@
 {
   "id": "com.svsound",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "compatibility": ">=6.0.0",
   "sdk": 3,
   "brandColor": "#346cb1",
@@ -13,7 +13,9 @@
     "de": "Unterstützung für SVSound"
   },
   "tags": {
-    "en": [ "subwoofer" ]
+    "en": [
+      "subwoofer"
+    ]
   },
   "category": [
     "music"

@@ -1,5 +1,8 @@
 {
   "2.0.0": {
     "en": "Updated to SDKv3"
+  },
+  "2.1.0": {
+    "en": "Improve bluetooth connection"
   }
 }
